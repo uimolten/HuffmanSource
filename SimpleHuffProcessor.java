@@ -55,7 +55,6 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             currByte = bits.readBits(BITS_PER_WORD);
         }
 
-
         HuffPriorityQ pq = new HuffPriorityQ();
 
         for (int i = 0; i < freqs.length; i++) {
@@ -64,14 +63,23 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                 pq.enqueue(new TreeNode(i, freqs[i]));
             }
         }
-
-        System.out.println(pq.toString() + "\n" +pq.size());
+        huffTree(pq);
 
         showString("Not working yet");
         myViewer.update("Still not working");
         throw new IOException("preprocess not implemented");
 
         // return 0;
+    }
+
+    private void huffTree(HuffPriorityQ pq) {
+        while (pq.size() >= 2) {
+            TreeNode left = pq.dequeue();
+            TreeNode right = pq.dequeue();
+            int freq = left.getFrequency() + right.getFrequency();
+            TreeNode temp = new TreeNode(left, freq, right);
+            pq.enqueue(temp);
+        }
     }
 
     /**
