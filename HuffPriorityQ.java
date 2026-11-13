@@ -12,21 +12,25 @@ public class HuffPriorityQ {
     }
 
     public boolean enqueue(TreeNode n) {
+        if (size == 0) {
+            con.add(n);
+        }
 
         for (int i = 0; i < con.size(); i++) {
             int compare = n.compareTo(con.get(i));
 
-            if (compare == 0) {
-                // put at the end of this freq count
-                TreeNode curr = con.get(i);
-                while (curr.compareTo(n) == 0) {
-                    curr = con.get(++i);
-                }
-                con.add(i, n);
-
-                size++;
-                return true;
-            } else if (compare < 0) {
+//            if (compare == 0) {
+//                // put at the end of this freq count
+//                TreeNode curr = con.get(i);
+//                while (curr.compareTo(n) == 0) {
+//                    curr = con.get(++i);
+//                }
+//                con.add(i, n);
+//
+//                size++;
+//                return true;
+//            } else
+          if (compare < 0) {
                 con.add(i, n);
                 size++;
                 return true;
@@ -45,6 +49,17 @@ public class HuffPriorityQ {
 
     public int size() {
         return size;
+    }
+
+    public String toString() {
+        StringBuilder result = new StringBuilder("(");
+        for (TreeNode n : con) {
+            result.append(n);
+            result.append(", ");
+        }
+        result.append(")");
+        return result.toString();
+
     }
 
 }

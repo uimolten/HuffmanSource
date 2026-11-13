@@ -55,16 +55,17 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             currByte = bits.readBits(BITS_PER_WORD);
         }
 
+
         HuffPriorityQ pq = new HuffPriorityQ();
 
         for (int i = 0; i < freqs.length; i++) {
             if (freqs[i] != 0) {
+                System.out.println("FREQ FOR " + i + " :: " + freqs[i]);
                 pq.enqueue(new TreeNode(i, freqs[i]));
             }
         }
-        for (int i = 0; i < pq.size(); i++) {
-            System.out.println(pq.dequeue());
-        }
+
+        System.out.println(pq.toString() + "\n" +pq.size());
 
         showString("Not working yet");
         myViewer.update("Still not working");
