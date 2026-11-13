@@ -14,20 +14,19 @@ public class HuffPriorityQ {
     public boolean enqueue(TreeNode n) {
         if (size == 0) {
             con.add(n);
+            size++;
         }
-
         for (int i = 0; i < con.size(); i++) {
-            int compare = n.compareTo(con.get(i));
-
-
-          if (compare < 0) {
+            if (n.compareTo(con.get(i)) < 0) {
                 con.add(i, n);
                 size++;
                 return true;
             }
         }
-        return false;
+
+        return true;
     }
+
     public TreeNode dequeue() {
         if (size > 0) {
             size--;
