@@ -34,7 +34,7 @@ public class HuffPriorityQ {
         }
         return false;
     }
-
+//sse
     public TreeNode dequeue() {
         if (size > 0) {
             size--;

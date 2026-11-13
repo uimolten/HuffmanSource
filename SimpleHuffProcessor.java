@@ -54,7 +54,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             freqs[currByte]++;
             currByte = bits.readBits(BITS_PER_WORD);
         }
-
+    // test
         HuffPriorityQ pq = new HuffPriorityQ();
 
         for (int i = 0; i < freqs.length; i++) {
