@@ -29,7 +29,6 @@ public class HuffPriorityQ {
 //
 //                size++;
 //                return true;
-//            } else
           if (compare < 0) {
                 con.add(i, n);
                 size++;
@@ -38,7 +37,6 @@ public class HuffPriorityQ {
         }
         return false;
     }
-
     public TreeNode dequeue() {
         if (size > 0) {
             size--;
