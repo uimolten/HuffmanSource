@@ -12,10 +12,6 @@ public class HuffPriorityQ {
     }
 
     public boolean enqueue(TreeNode n) {
-        if (size == 0) {
-            con.add(n);
-            size++;
-        }
         for (int i = 0; i < con.size(); i++) {
             if (n.compareTo(con.get(i)) < 0) {
                 con.add(i, n);
@@ -24,6 +20,8 @@ public class HuffPriorityQ {
             }
         }
 
+        con.add(n);
+        size++;
         return true;
     }
 
