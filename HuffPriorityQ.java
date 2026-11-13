@@ -19,16 +19,7 @@ public class HuffPriorityQ {
         for (int i = 0; i < con.size(); i++) {
             int compare = n.compareTo(con.get(i));
 
-//            if (compare == 0) {
-//                // put at the end of this freq count
-//                TreeNode curr = con.get(i);
-//                while (curr.compareTo(n) == 0) {
-//                    curr = con.get(++i);
-//                }
-//                con.add(i, n);
-//
-//                size++;
-//                return true;
+
           if (compare < 0) {
                 con.add(i, n);
                 size++;
