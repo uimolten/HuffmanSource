@@ -57,9 +57,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             currByte = bits.readBits(BITS_PER_WORD);
         }
 
-
         HuffPriorityQ pq = new HuffPriorityQ();
-        pq.enqueue(new TreeNode(PSEUDO_EOF, 1));
 
         for (int i = 0; i < freqs.length; i++) {
             if (freqs[i] != 0) {
@@ -67,14 +65,15 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                 pq.enqueue(new TreeNode(i, freqs[i]));
             }
         }
+        pq.enqueue(new TreeNode(PSEUDO_EOF, 1));
+
         huffTree(pq);
 
         Map<Integer, String> chunkMap = new HashMap<>();
 
-        createMap(chunkMap, "",  pq.dequeue());
+        createMap(chunkMap, "", pq.dequeue());
 
         System.out.println(chunkMap);
-
 
         showString("Not working yet");
         myViewer.update("Still not working");
@@ -98,9 +97,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             chunkMap.put(n.getValue(), code);
             return;
         }
-
         createMap(chunkMap, code + "0", n.getLeft());
-
         createMap(chunkMap, code + "1", n.getRight());
 
     }
