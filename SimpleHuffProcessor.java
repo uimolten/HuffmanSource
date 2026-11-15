@@ -198,6 +198,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      *                     writing to the output file.
      */
     public int uncompress(InputStream in, OutputStream out) throws IOException {
+
+        BitInputStream bits = new BitInputStream(in);
         throw new IOException("uncompress not implemented");
         // return 0;
     }
