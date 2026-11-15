@@ -200,6 +200,14 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     public int uncompress(InputStream in, OutputStream out) throws IOException {
 
         BitInputStream bits = new BitInputStream(in);
+        BitOutputStream decode = new BitOutputStream(out);
+
+        // checks if the file we are trying to decode is a huffman file (reads header)
+        int magic = bits.readBits(BITS_PER_INT);
+        if (magic != MAGIC_NUMBER) {
+            // idk what we do here
+        }
+
         throw new IOException("uncompress not implemented");
         // return 0;
     }
