@@ -82,8 +82,13 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         for (int i = 0; i < freqs.length; i++) {
             if (freqs[i] > 0) {
                 compressedBits += freqs[i] * chunkMap.get(i).length();
+                showString("Value: " + i + " | Frequency: " + freqs[i]
+                        + " | Code: " + chunkMap.get(i));
             }
         }
+        showString("PSEUDO_EOF: " + PSEUDO_EOF
+                + " | Frequency: 1"
+                + " | Code: " + chunkMap.get(PSEUDO_EOF));
 
         compressedBits += chunkMap.get(PSEUDO_EOF).length();
 
@@ -178,7 +183,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
 
         encode.flush();
-
+        showString("Compressed bits written: " + compressCount);
         return compressCount;
     }
 
