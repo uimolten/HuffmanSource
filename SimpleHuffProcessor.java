@@ -133,8 +133,9 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             currByte = bits.readBits(BITS_PER_WORD);
             String curr = chunkMap.get(currByte);
 
-            encode.
-
+            for (int i = 0; i < curr.length(); i++) {
+                encode.write((int) curr.charAt(i) - '0');
+            }
         }
 
 
