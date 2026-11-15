@@ -27,6 +27,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     private IHuffViewer myViewer;
     private Map<Integer, String> chunkMap;
     private int[] freqs;
+    private int savedBits;
 
     /**
      * Preprocess data so that compression is possible ---
@@ -54,14 +55,11 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         int totalBits = 0;
         freqs = new int[256];
         int currByte = bits.readBits(BITS_PER_WORD);
-        if (currByte != -1) {
-            totalBits += BITS_PER_WORD;
-        }
 
         while (currByte != -1) {
             freqs[currByte]++;
-            currByte = bits.readBits(BITS_PER_WORD);
             totalBits += BITS_PER_WORD;
+            currByte = bits.readBits(BITS_PER_WORD);
         }
 
         HuffPriorityQ pq = new HuffPriorityQ();
@@ -79,15 +77,23 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         chunkMap = new HashMap<>();
 
         createMap(chunkMap, "", pq.dequeue());
+        int compressedBits = (2 * BITS_PER_INT) + (ALPH_SIZE * BITS_PER_INT);
+
+        for (int i = 0; i < freqs.length; i++) {
+            if (freqs[i] > 0) {
+                compressedBits += freqs[i] * chunkMap.get(i).length();
+            }
+        }
+
+        compressedBits += chunkMap.get(PSEUDO_EOF).length();
 
         System.out.println(chunkMap);
 
-
-//        showString("Not working yet");
-//        myViewer.update("Still not working");
-//        throw new IOException("preprocess not implemented");
-
-         return totalBits;
+        // showString("Not working yet");
+        // myViewer.update("Still not working");
+        // throw new IOException("preprocess not implemented");
+        savedBits = totalBits - compressedBits;
+        return savedBits;
     }
 
     private void huffTree(HuffPriorityQ pq) {
@@ -130,7 +136,9 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      */
     public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
 
-
+        if (savedBits < 0 && force == false) {
+            return 0;
+        }
         BitInputStream bits = new BitInputStream(in);
         BitOutputStream encode = new BitOutputStream(out);
         int compressCount = 0;
@@ -139,17 +147,17 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         encode.writeBits(BITS_PER_INT, IHuffConstants.MAGIC_NUMBER);
         compressCount += BITS_PER_INT;
 
-        //2. store counts
+        // 2. store counts
         encode.writeBits(BITS_PER_INT, IHuffConstants.STORE_COUNTS);
         compressCount += BITS_PER_INT;
 
-        //3. information to recreate HuffTree
-        for(int k=0; k < IHuffConstants.ALPH_SIZE; k++) {
+        // 3. information to recreate HuffTree
+        for (int k = 0; k < IHuffConstants.ALPH_SIZE; k++) {
             encode.writeBits(BITS_PER_INT, freqs[k]);
             compressCount += BITS_PER_INT;
         }
 
-        //4. compressed data
+        // 4. compressed data
 
         int currByte = bits.readBits(BITS_PER_WORD);
         while (currByte != -1) {
@@ -164,7 +172,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
         // 5. PSEUDO_EOF constant
         String EOF = chunkMap.get(PSEUDO_EOF);
-        for (char c : EOF.toCharArray()){
+        for (char c : EOF.toCharArray()) {
             encode.writeBits(1, c - '0');
             compressCount++;
         }
