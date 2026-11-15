@@ -26,6 +26,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
     private IHuffViewer myViewer;
     private Map<Integer, String> chunkMap;
+    private int[] freqs;
 
     /**
      * Preprocess data so that compression is possible ---
@@ -51,7 +52,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
         BitInputStream bits = new BitInputStream(in);
 
-        int[] freqs = new int[256];
+        freqs = new int[256];
         int currByte = bits.readBits(BITS_PER_WORD);
         while (currByte != -1) {
             freqs[currByte]++;
@@ -127,15 +128,33 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         BitInputStream bits = new BitInputStream(in);
         BitOutputStream encode = new BitOutputStream(out);
 
+        // 1. magic number
+        encode.writeBits(BITS_PER_INT, IHuffConstants.MAGIC_NUMBER);
+
+        //2. store counts
+        encode.writeBits(BITS_PER_INT, IHuffConstants.STORE_COUNTS);
+
+        //3. information to recreate HuffTree
+        for(int k=0; k < IHuffConstants.ALPH_SIZE; k++) {
+            encode.writeBits(BITS_PER_INT, freqs[k]);
+        }
+
+        //4. compressed data
 
         int currByte = bits.readBits(BITS_PER_WORD);
         while (currByte != -1) {
-            currByte = bits.readBits(BITS_PER_WORD);
             String curr = chunkMap.get(currByte);
 
             for (int i = 0; i < curr.length(); i++) {
-                encode.write((int) curr.charAt(i) - '0');
+                encode.writeBits(1, curr.charAt(i) - '0');
             }
+            currByte = bits.readBits(BITS_PER_WORD);
+        }
+
+        // 5. PSEUDO_EOF constant
+        String EOF = chunkMap.get(PSEUDO_EOF);
+        for (char c : EOF.toCharArray()){
+            encode.writeBits(1, c - '0');
         }
 
 
