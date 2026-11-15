@@ -25,6 +25,7 @@ import java.util.Map;
 public class SimpleHuffProcessor implements IHuffProcessor {
 
     private IHuffViewer myViewer;
+    private Map<Integer, String> chunkMap;
 
     /**
      * Preprocess data so that compression is possible ---
@@ -69,17 +70,18 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
         huffTree(pq);
 
-        Map<Integer, String> chunkMap = new HashMap<>();
+        chunkMap = new HashMap<>();
 
         createMap(chunkMap, "", pq.dequeue());
 
         System.out.println(chunkMap);
 
-        showString("Not working yet");
-        myViewer.update("Still not working");
-        throw new IOException("preprocess not implemented");
 
-        // return 0;
+//        showString("Not working yet");
+//        myViewer.update("Still not working");
+//        throw new IOException("preprocess not implemented");
+
+         return 0;
     }
 
     private void huffTree(HuffPriorityQ pq) {
@@ -121,6 +123,22 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      *                     writing to the output file.
      */
     public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
+
+        BitInputStream bits = new BitInputStream(in);
+        BitOutputStream encode = new BitOutputStream(out);
+
+
+        int currByte = bits.readBits(BITS_PER_WORD);
+        while (currByte != -1) {
+            currByte = bits.readBits(BITS_PER_WORD);
+            String curr = chunkMap.get(currByte);
+
+            encode.
+
+        }
+
+
+
         throw new IOException("compress is not implemented");
         // return 0;
     }
