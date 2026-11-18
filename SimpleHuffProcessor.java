@@ -224,40 +224,63 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         BitInputStream bits = new BitInputStream(in);
 
         int magic = bits.readBits(BITS_PER_INT);
+        if (magic != MAGIC_NUMBER) {
+            myViewer.showError("Error reading compressed file. \n" +
+                    "File did not start with the huff magic number.");
+            return -1;
+        }
 
         int store = bits.readBits(BITS_PER_INT);
 
-        if (store == IHuffConstants.STORE_COUNTS) {
+        if (store == STORE_COUNTS) {
             HuffPriorityQ pq = new HuffPriorityQ();
 
-            for (int i = 0; i < freqs.length; i++) {
-                if (freqs[i] != 0) {
-                    pq.enqueue(new TreeNode(i, freqs[i]));
+            for (int i = 0; i < ALPH_SIZE; i++) {
+                int count = bits.readBits(BITS_PER_INT);
+
+                if (count < 0) {
+                    throw new IOException("Missing or invalid frequency count.");
+                }
+
+                if (count > 0) {
+                    pq.enqueue(new TreeNode(i, count));
                 }
             }
             pq.enqueue(new TreeNode(PSEUDO_EOF, 1));
 
             huffTree(pq);
+            root = pq.dequeue();
         } else {
             // STF
             int size = bits.readBits(BITS_PER_INT);
-            root = uncompressHelper(bits);
+            root = uncompressBuilder(bits);
 
         }
 
         BitOutputStream decode = new BitOutputStream(out);
+        uncompressHelper(root, bits, decode);
 
-        // checks if the file we are trying to decode is a huffman file (reads header)
-        // int magic = bits.readBits(BITS_PER_INT);
-        // if (magic != MAGIC_NUMBER) {
-        // // idk what we do here
-        // }
-
-        throw new IOException("uncompress not implemented");
-        // return 0;
+        return 0;
     }
 
-    private TreeNode uncompressHelper(BitInputStream in) throws IOException {
+    private void uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode) throws IOException {
+
+        if (n.isLeaf() && n.getValue() != PSEUDO_EOF) {
+            decode.write(n.getValue());
+            uncompressHelper(root, in, decode);
+        } else if (n.getValue() != PSEUDO_EOF) {
+            int dir = in.readBits(1);
+            if (dir == 0) {
+                uncompressHelper(n.getLeft(), in, decode);
+            } else {
+                uncompressHelper(n.getRight(), in, decode);
+            }
+
+        }
+
+    }
+
+    private TreeNode uncompressBuilder(BitInputStream in) throws IOException {
         int cur = in.readBits(1);
         if (cur == -1) {
             throw new IOException("error in reading compressed file");
@@ -267,8 +290,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             showString("decoded value written:" + val);
             return new TreeNode(val, 0);
         } else {
-            TreeNode left = uncompressHelper(in);
-            TreeNode right = uncompressHelper(in);
+            TreeNode left = uncompressBuilder(in);
+            TreeNode right = uncompressBuilder(in);
             return new TreeNode(left, 0, right);
         }
     }
