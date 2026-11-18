@@ -11,6 +11,10 @@ public class HuffPriorityQ {
         size = 0;
     }
 
+    public TreeNode peek() {
+        return con.get(0);
+    }
+
     public boolean enqueue(TreeNode n) {
         for (int i = 0; i < con.size(); i++) {
             if (n.compareTo(con.get(i)) < 0) {
