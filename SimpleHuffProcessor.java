@@ -240,6 +240,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             huffTree(pq);
         } else {
             // STF
+            int size = bits.readBits(BITS_PER_INT);
+            uncompressHelper(bits);
 
         }
 
@@ -255,14 +257,17 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         // return 0;
     }
 
-    private TreeNode uncompressHelper(BitInputStream in) {
-
-        if (in.readBits(1) == 1) {
-            int val = in.readBits(9);
-            return new TreeNode(val, freqs[val]);
+    private TreeNode uncompressHelper(BitInputStream in) throws IOException {
+        int cur = in.readBits(1);
+        if (cur == -1) {
+            throw new IOException("error in reading compressed file");
+        }
+        if (cur == 1) {
+            return new TreeNode(in.readBits(BITS_PER_WORD + 1), 0);
         } else {
-            return new TreeNode(0, 0);
-
+            TreeNode left = uncompressHelper(in);
+            TreeNode right = uncompressHelper(in);
+            return new TreeNode(left, 0, right);
         }
     }
 
