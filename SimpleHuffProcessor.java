@@ -241,7 +241,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         } else {
             // STF
             int size = bits.readBits(BITS_PER_INT);
-            uncompressHelper(bits);
+            root = uncompressHelper(bits);
 
         }
 
@@ -263,7 +263,9 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             throw new IOException("error in reading compressed file");
         }
         if (cur == 1) {
-            return new TreeNode(in.readBits(BITS_PER_WORD + 1), 0);
+            int val = in.readBits(BITS_PER_WORD + 1);
+            showString("decoded value written:" + val);
+            return new TreeNode(val, 0);
         } else {
             TreeNode left = uncompressHelper(in);
             TreeNode right = uncompressHelper(in);
