@@ -29,6 +29,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     private TreeNode root;
     private int[] freqs;
     private int savedBits;
+    private int headerFormat;
 
     /**
      * Preprocess data so that compression is possible ---
@@ -51,6 +52,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * @throws IOException if an error occurs while reading from the input file.
      */
     public int preprocessCompress(InputStream in, int headerFormat) throws IOException {
+        this.headerFormat = headerFormat;
 
         BitInputStream bits = new BitInputStream(in);
         int totalBits = 0;
@@ -154,21 +156,20 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
         encode.writeBits(BITS_PER_INT, IHuffConstants.MAGIC_NUMBER);
         compressCount += BITS_PER_INT;
-        int magic = bits.readBits(BITS_PER_INT);
 
         // 2. store counts
         encode.writeBits(BITS_PER_INT, IHuffConstants.STORE_COUNTS);
         compressCount += BITS_PER_INT;
-        int storeType = bits.readBits(BITS_PER_INT);
 
         // 3. information to recreate HuffTree
 
-        if (storeType == STORE_COUNTS) {
+        if (headerFormat == STORE_COUNTS) {
             for (int k = 0; k < IHuffConstants.ALPH_SIZE; k++) {
                 encode.writeBits(BITS_PER_INT, freqs[k]);
                 compressCount += BITS_PER_INT;
             }
         } else {
+            int size = bits.readBits(BITS_PER_INT);
             treeBuilder(root, encode);
         }
 
@@ -237,7 +238,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
             for (int i = 0; i < ALPH_SIZE; i++) {
                 int count = bits.readBits(BITS_PER_INT);
-
+                showString(count + " ");
                 if (count < 0) {
                     throw new IOException("Missing or invalid frequency count.");
                 }
@@ -270,6 +271,9 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             uncompressHelper(root, in, decode);
         } else if (n.getValue() != PSEUDO_EOF) {
             int dir = in.readBits(1);
+            if (dir == -1) {
+                throw new IOException("Input ended before PSEUDO EOF");
+            }
             if (dir == 0) {
                 uncompressHelper(n.getLeft(), in, decode);
             } else {
