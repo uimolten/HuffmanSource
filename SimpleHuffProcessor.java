@@ -1,7 +1,7 @@
 /*  Student information for assignment:
  *
- *  On <MY|OUR> honor, <NAME1> and <NAME2), this programming assignment is <MY|OUR> own work
- *  and <I|WE> have not provided this code to any other student.
+ *  On OUR honor, Ethan W and Rionn T, this programming assignment is OUR own work
+ *  and WE have not provided this code to any other student.
  *
  *  Number of slip days used:
  *
@@ -108,6 +108,11 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         return savedBits;
     }
 
+    /**
+     * Helper method to construct the HuffTree.
+     * @param pq is the custom Priority Queue that stores the TreeNodes used to construct the
+     *           HuffTree
+     */
     private void huffTree(HuffPriorityQ pq) {
         while (pq.size() >= 2) {
             TreeNode left = pq.dequeue();
@@ -118,6 +123,15 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
     }
 
+    /**
+     * Helper method to construct the compressed version of each character in the alphabet of
+     * characters used in the original file
+     * @param chunkMap Stores an Integer-String key-value pair, where Integers are the
+     *                 ASCII/UNICODE integer representation of each character, and the String is
+     *                 the Huffman-Created bit representation of the character.
+     * @param code stores the currently built Huffman string representation of the character.
+     * @param n is the reference to the current TreeNode being visited.
+     */
     private void createMap(Map<Integer, String> chunkMap, String code, TreeNode n) {
         if (n.isLeaf()) {
             chunkMap.put(n.getValue(), code);
