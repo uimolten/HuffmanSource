@@ -205,6 +205,12 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         return compressCount;
     }
 
+    /**
+     * Helper method to get the number of bits that are needed to create the instructions for
+     * rebuilding the tree in uncompress
+     * @param n is the reference to the current Tree node being visited
+     * @return the number of bits needed for the instructions for rebuilding the HuffTree with STF
+     */
     private int treeSize(TreeNode n) {
         if (n.isLeaf()) {
             return 1 + (BITS_PER_WORD + 1);
@@ -213,6 +219,13 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         return 1 + treeSize(n.getLeft()) + treeSize(n.getRight());
     }
 
+    /**
+     * Helper method to write the instructions for building the HuffTree using STF (Standard
+     * Tree Format)
+     * @param n is the reference to the current node being visited in precompress-made HuffTree
+     * @param out is the encoding file being created; the file that takes in the constructions
+     *            for the HuffTree
+     */
     private void treeBuilder(TreeNode n, BitOutputStream out) {
         if (n.isLeaf()) {
             out.writeBits(1, 1);
@@ -222,7 +235,6 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             treeBuilder(n.getLeft(), out);
             treeBuilder(n.getRight(), out);
         }
-
     }
 
     /**
@@ -247,6 +259,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
 
         int store = bits.readBits(BITS_PER_INT);
+        System.out.println(store == STORE_COUNTS ? "SCF" : "STF");
 
         if (store == STORE_COUNTS) {
             HuffPriorityQ pq = new HuffPriorityQ();
@@ -270,16 +283,27 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             // STF
             int size = bits.readBits(BITS_PER_INT);
             root = uncompressBuilder(bits);
-
         }
 
         BitOutputStream decode = new BitOutputStream(out);
         decode.flush();
         return uncompressHelper(root, bits, decode);
-
     }
 
-    private int uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode) throws IOException {
+    /**
+     * Helper method to rebuild the original file version of the hf (Huffman Compressed) file.
+     *
+     * @param n is the reference to the current TreeNode being visited in the HuffTree
+     * @param in is the previously compressed data
+     * @param decode is he newly created data file
+     * @return an int representing the amount of bits written into the newly constructed
+     * file/output stream.
+     *
+     * @throws IOException if an error occurs while reading the input file or writing the output
+     * file.
+     */
+    private int uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode)
+            throws IOException {
 
         int bitsWritten = 0;
         while (n.getValue() != PSEUDO_EOF) {
@@ -300,6 +324,15 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
     }
 
+    /**
+     * Helper method to reconstruct the Huffman Tree using information provided under the STF
+     * (Standard Tree Format) instructions.
+     *
+     * @param in is the previously compressed data
+     * @return the constructed STF Tree used to uncompress the BitInputStream
+     * @throws IOException if an error occurs while reading from the input file or
+     *                     writing to the output file.
+     */
     private TreeNode uncompressBuilder(BitInputStream in) throws IOException {
         int cur = in.readBits(1);
         if (cur == -1) {
