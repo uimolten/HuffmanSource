@@ -281,18 +281,17 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
     private void uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode) throws IOException {
 
-        if (n.isLeaf() && n.getValue() != PSEUDO_EOF) {
-            decode.write(n.getValue());
-            uncompressHelper(root, in, decode);
-        } else if (n.getValue() != PSEUDO_EOF) {
-            int dir = in.readBits(1);
-            if (dir == -1) {
-                throw new IOException("Input ended before PSEUDO EOF");
-            }
-            if (dir == 0) {
-                uncompressHelper(n.getLeft(), in, decode);
+        while (n.getValue() != PSEUDO_EOF) {
+            if (n.isLeaf()) {
+                decode.write(n.getValue());
+                n = root;
             } else {
-                uncompressHelper(n.getRight(), in, decode);
+                int dir = in.readBits(1);
+                if (dir == 0) {
+                    n = n.getLeft();
+                } else {
+                    n = n.getRight();
+                }
             }
 
         }
