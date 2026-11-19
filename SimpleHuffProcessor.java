@@ -81,8 +81,16 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         chunkMap = new HashMap<>();
 
         createMap(chunkMap, "", pq.dequeue());
-        int compressedBits = (2 * BITS_PER_INT) + (ALPH_SIZE * BITS_PER_INT);
+        // Magic number and header-format identifier.
+        int compressedBits = 2 * BITS_PER_INT;
 
+        if (headerFormat == STORE_COUNTS) {
+            compressedBits += ALPH_SIZE * BITS_PER_INT;
+        } else if (headerFormat == STORE_TREE) {
+            compressedBits += BITS_PER_INT + treeSize(root);
+        } else {
+            throw new IOException("Unknown header format.");
+        }
         for (int i = 0; i < freqs.length; i++) {
             if (freqs[i] > 0) {
                 compressedBits += freqs[i] * chunkMap.get(i).length();
@@ -96,11 +104,6 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
         compressedBits += chunkMap.get(PSEUDO_EOF).length();
 
-        System.out.println(chunkMap);
-
-        // showString("Not working yet");
-        // myViewer.update("Still not working");
-        // throw new IOException("preprocess not implemented");
         savedBits = totalBits - compressedBits;
         return savedBits;
     }
@@ -168,9 +171,10 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                 encode.writeBits(BITS_PER_INT, freqs[k]);
                 compressCount += BITS_PER_INT;
             }
-        } else {
-            int size = bits.readBits(BITS_PER_INT);
+        } else if (headerFormat == STORE_TREE) {
+            int size = treeSize(root);
             treeBuilder(root, encode);
+            compressCount += BITS_PER_INT + size;
         }
 
         // 4. compressed data
@@ -198,10 +202,18 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         return compressCount;
     }
 
+    private int treeSize(TreeNode n) {
+        if (n.isLeaf()) {
+            return 1 + (BITS_PER_WORD + 1);
+        }
+
+        return 1 + treeSize(n.getLeft()) + treeSize(n.getRight());
+    }
+
     private void treeBuilder(TreeNode n, BitOutputStream out) {
         if (n.isLeaf()) {
             out.writeBits(1, 1);
-            out.writeBits(9, n.getValue());
+            out.writeBits(BITS_PER_WORD + 1, n.getValue());
         } else {
             out.writeBits(1, 0);
             treeBuilder(n.getLeft(), out);
@@ -251,7 +263,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
             huffTree(pq);
             root = pq.dequeue();
-        } else {
+        } else if (store == STORE_TREE) {
             // STF
             int size = bits.readBits(BITS_PER_INT);
             root = uncompressBuilder(bits);
