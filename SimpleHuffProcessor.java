@@ -160,8 +160,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         encode.writeBits(BITS_PER_INT, IHuffConstants.MAGIC_NUMBER);
         compressCount += BITS_PER_INT;
 
-        // 2. store counts
-        encode.writeBits(BITS_PER_INT, IHuffConstants.STORE_COUNTS);
+        // 2. store header format
+        encode.writeBits(BITS_PER_INT, headerFormat);
         compressCount += BITS_PER_INT;
 
         // 3. information to recreate HuffTree
@@ -173,7 +173,10 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             }
         } else if (headerFormat == STORE_TREE) {
             int size = treeSize(root);
+
+            encode.writeBits(BITS_PER_INT, size);
             treeBuilder(root, encode);
+
             compressCount += BITS_PER_INT + size;
         }
 
@@ -240,7 +243,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         if (magic != MAGIC_NUMBER) {
             myViewer.showError("Error reading compressed file. \n" +
                     "File did not start with the huff magic number.");
-            return -1;
+            throw new IOException("Magic number doesnt match");
         }
 
         int store = bits.readBits(BITS_PER_INT);
