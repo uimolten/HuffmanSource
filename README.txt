@@ -60,3 +60,5 @@ compression time: 79.024
 
 
 
+Observations so far:
+Store Tree format tends to take longer to compress, more noticable on image files and when I read hf files instead of ignoring.
