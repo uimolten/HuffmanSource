@@ -40,13 +40,13 @@ public class HuffMark {
 
     public void compress(File f) throws IOException {
 
-        if (f.getName().endsWith(SUFFIX))
-            return; // don't read .hf files!
+        // if (f.getName().endsWith(SUFFIX))
+        // return; // don't read .hf files!
         if (f.isDirectory())
             return; // don't read directories
 
         double start = System.currentTimeMillis();
-        myHuffer.preprocessCompress(getFastByteReader(f), IHuffProcessor.STORE_COUNTS);
+        myHuffer.preprocessCompress(getFastByteReader(f), IHuffProcessor.STORE_TREE);
         File outFile = new File(getCompressedName(f));
         FileOutputStream out = new FileOutputStream(outFile);
         System.out.println("compressing to: " + outFile.getCanonicalPath());
