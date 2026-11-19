@@ -274,16 +274,18 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
 
         BitOutputStream decode = new BitOutputStream(out);
-        uncompressHelper(root, bits, decode);
+        decode.flush();
+        return uncompressHelper(root, bits, decode);
 
-        return 0;
     }
 
-    private void uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode) throws IOException {
+    private int uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode) throws IOException {
 
+        int bitsWritten = 0;
         while (n.getValue() != PSEUDO_EOF) {
             if (n.isLeaf()) {
-                decode.write(n.getValue());
+                decode.writeBits(BITS_PER_WORD, n.getValue());
+                bitsWritten += BITS_PER_WORD;
                 n = root;
             } else {
                 int dir = in.readBits(1);
@@ -293,8 +295,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                     n = n.getRight();
                 }
             }
-
         }
+        return bitsWritten;
 
     }
 
