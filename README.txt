@@ -84,4 +84,28 @@ total percent compression 6.250
 compression time: 79.024
 
 
+STORECOUNTS FOR BOOKSANDHTML
+No hf files:
+total bytes read: 9890302
+total compressed bytes 5915237
+total percent compression 40.192
+compression time: 25.314
+HF files:
+total bytes read: 15805539
+total compressed bytes 11743264
+total percent compression 25.702
+compression time: 61.639
+STORETREE FOR BOOKSANDHTML
+NO HF:
+total bytes read: 817279
+total compressed bytes 461102
+total percent compression 43.581
+compression time: 2.571
+HF:
+total bytes read: 1278381
+total compressed bytes 915773
+total percent compression 28.365
+compression time: 5.491
+
+
 
