@@ -6,9 +6,9 @@
  *  Number of slip days used:
  *
  *  Student 1 (Student whose Canvas account is being used)
- *  UTEID:
- *  email address:
- *  Grader name:
+ *  UTEID:rrt873
+ *  email address: rrt873@my.utexas.edu
+ *  Grader name: 
  *
  *  Student 2
  *  UTEID:
@@ -56,7 +56,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
         BitInputStream bits = new BitInputStream(in);
         int totalBits = 0;
-        freqs = new int[256];
+        freqs = new int[ALPH_SIZE];
         int currByte = bits.readBits(BITS_PER_WORD);
 
         while (currByte != -1) {
@@ -110,27 +110,33 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
     /**
      * Helper method to construct the HuffTree.
-     * @param pq is the custom Priority Queue that stores the TreeNodes used to construct the
+     * 
+     * @param pq is the custom Priority Queue that stores the TreeNodes used to
+     *           construct the
      *           HuffTree
      */
     private void huffTree(HuffPriorityQ pq) {
         while (pq.size() >= 2) {
             TreeNode left = pq.dequeue();
             TreeNode right = pq.dequeue();
-            int freq = left.getFrequency() + right.getFrequency();
-            TreeNode temp = new TreeNode(left, freq, right);
+            TreeNode temp = new TreeNode(left, 0, right);
             pq.enqueue(temp);
         }
     }
 
     /**
-     * Helper method to construct the compressed version of each character in the alphabet of
+     * Helper method to construct the compressed version of each character in the
+     * alphabet of
      * characters used in the original file
-     * @param chunkMap Stores an Integer-String key-value pair, where Integers are the
-     *                 ASCII/UNICODE integer representation of each character, and the String is
+     * 
+     * @param chunkMap Stores an Integer-String key-value pair, where Integers are
+     *                 the
+     *                 ASCII/UNICODE integer representation of each character, and
+     *                 the String is
      *                 the Huffman-Created bit representation of the character.
-     * @param code stores the currently built Huffman string representation of the character.
-     * @param n is the reference to the current TreeNode being visited.
+     * @param code     stores the currently built Huffman string representation of
+     *                 the character.
+     * @param n        is the reference to the current TreeNode being visited.
      */
     private void createMap(Map<Integer, String> chunkMap, String code, TreeNode n) {
         if (n.isLeaf()) {
@@ -162,7 +168,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      */
     public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
 
-        if (savedBits < 0 && force == false) {
+        if (savedBits < 0 && !force) {
             return 0;
         }
         BitInputStream bits = new BitInputStream(in);
@@ -220,10 +226,13 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     }
 
     /**
-     * Helper method to get the number of bits that are needed to create the instructions for
+     * Helper method to get the number of bits that are needed to create the
+     * instructions for
      * rebuilding the tree in uncompress
+     * 
      * @param n is the reference to the current Tree node being visited
-     * @return the number of bits needed for the instructions for rebuilding the HuffTree with STF
+     * @return the number of bits needed for the instructions for rebuilding the
+     *         HuffTree with STF
      */
     private int treeSize(TreeNode n) {
         if (n.isLeaf()) {
@@ -234,10 +243,14 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     }
 
     /**
-     * Helper method to write the instructions for building the HuffTree using STF (Standard
+     * Helper method to write the instructions for building the HuffTree using STF
+     * (Standard
      * Tree Format)
-     * @param n is the reference to the current node being visited in precompress-made HuffTree
-     * @param out is the encoding file being created; the file that takes in the constructions
+     * 
+     * @param n   is the reference to the current node being visited in
+     *            precompress-made HuffTree
+     * @param out is the encoding file being created; the file that takes in the
+     *            constructions
      *            for the HuffTree
      */
     private void treeBuilder(TreeNode n, BitOutputStream out) {
@@ -300,21 +313,26 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
 
         BitOutputStream decode = new BitOutputStream(out);
+        int bitsWritten = uncompressHelper(root, bits, decode);
         decode.flush();
-        return uncompressHelper(root, bits, decode);
+        return bitsWritten;
     }
 
     /**
-     * Helper method to rebuild the original file version of the hf (Huffman Compressed) file.
+     * Helper method to rebuild the original file version of the hf (Huffman
+     * Compressed) file.
      *
-     * @param n is the reference to the current TreeNode being visited in the HuffTree
-     * @param in is the previously compressed data
+     * @param n      is the reference to the current TreeNode being visited in the
+     *               HuffTree
+     * @param in     is the previously compressed data
      * @param decode is he newly created data file
-     * @return an int representing the amount of bits written into the newly constructed
-     * file/output stream.
+     * @return an int representing the amount of bits written into the newly
+     *         constructed
+     *         file/output stream.
      *
-     * @throws IOException if an error occurs while reading the input file or writing the output
-     * file.
+     * @throws IOException if an error occurs while reading the input file or
+     *                     writing the output
+     *                     file.
      */
     private int uncompressHelper(TreeNode n, BitInputStream in, BitOutputStream decode)
             throws IOException {
@@ -339,7 +357,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     }
 
     /**
-     * Helper method to reconstruct the Huffman Tree using information provided under the STF
+     * Helper method to reconstruct the Huffman Tree using information provided
+     * under the STF
      * (Standard Tree Format) instructions.
      *
      * @param in is the previously compressed data

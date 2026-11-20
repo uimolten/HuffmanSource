@@ -1,4 +1,21 @@
 
+/*  Student information for assignment:
+ *
+ *  On OUR honor, Ethan W and Rionn T, this programming assignment is OUR own work
+ *  and WE have not provided this code to any other student.
+ *
+ *  Number of slip days used:
+ *
+ *  Student 1 (Student whose Canvas account is being used)
+ *  UTEID:rrt873
+ *  email address: rrt873@my.utexas.edu
+ *  Grader name: 
+ *
+ *  Student 2
+ *  UTEID:
+ *  email address:
+ *
+ */
 import java.util.ArrayList;
 
 public class HuffPriorityQ {

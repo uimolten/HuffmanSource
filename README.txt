@@ -1,3 +1,28 @@
+
+
+Exerpiment Analysis:
+
+
+The calgary collection (text files) compress much more compared to Waterloo (images). 
+This probably is because Huffman coding works best when some byte values occur much more frequently than others, b
+ecause those common values receive shorter codes.
+
+The waterloo images compressed less because those images had lots of different colors and patterns which resulted in more distributed
+byte frequencies, and less opportunities for shortening their codes.
+
+Store Tree format tends to take longer to compress than Store Count format, more noticable on image files and when I read hf files instead of ignoring.
+
+When we added already compressed files, the compression time roughly doubled, but the percent compression
+was mostly less than double. 
+
+
+
+
+
+
+
+
+
 Calgary times (SCF): 
 
 read hf files
@@ -60,5 +85,3 @@ compression time: 79.024
 
 
 
-Observations so far:
-Store Tree format tends to take longer to compress, more noticable on image files and when I read hf files instead of ignoring.
