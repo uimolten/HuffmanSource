@@ -12,8 +12,8 @@
  *  Grader name: 
  *
  *  Student 2
- *  UTEID:
- *  email address:
+ *  UTEID: emw3442
+ *  email address: emw3442@my.utexas,edu
  *
  */
 import java.util.ArrayList;

@@ -3,19 +3,29 @@
 Experiment Analysis:
 
 
-The calgary collection (text files) compress much more compared to Waterloo (images). 
-This probably is because Huffman coding works best when some byte values occur much more frequently
-than others, because those common values receive shorter codes.
+The calgary collection (text files) compress much more compared to Waterloo (images). Calgary had
+about 43% compression, while Waterloo only had about 18%.
+This is probably is because Huffman coding works best when some byte values occur much more
+frequently than others, because those common values receive shorter codes.
 
-The waterloo images compressed less because those images had lots of different colors and patterns
-which resulted in more distributed byte frequencies, and less opportunities for shortening their
-codes.
+The waterloo images compressed less, likely because those files' byte frequencies were more evenly
+distributed, allowing less opportunity to save space by assigning different, shorter codes to common
+ values.
 
-Store Tree format tends to take longer to compress than Store Count format, more noticable on image
-files and when we read hf files instead of ignoring.
+In general, Store tree format produces smaller compressed files than store coutn for both calgary
+and waterloo when ignoring hf files. This is probably because storing the tree required less header
+space, than the frequency counts.
 
-When we added already compressed files, the compression time roughly doubled, but the percent compression
-was mostly less than double. 
+The compression times were pretty similar when ignoring hf files. Store tree was slightly faster for
+ calgary and slower for waterloo, and results do not exactly prove one or the other is consitently
+ faster.
+
+ However, including the hf files increased compression time, and the overall percent compression
+ decreased, suggesting that the already compressed files had fewer opprtunities to compress further.
+
+Finally, for BooksAndHTML, there was great compression, but the results cannot be used to compare
+the header formats as the original input sizes were different between the store count and store tree
+ runs.
 
 
 
